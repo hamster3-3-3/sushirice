@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -48,10 +48,13 @@
 
                 <!-- 一、外觀 -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">1</span>
-                        一、外觀 (Appearance) <span class="text-sm font-normal text-gray-400 ml-2">權重: 30</span>
-                    </h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">1</span>
+                            一、外觀 (Appearance)
+                        </h2>
+                        <span class="text-xs font-bold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">權重: 20%</span>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="group-appearance">
                         <div onclick="setScore('appearance', 1, 0)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="1">
                             <span class="text-gray-700 font-medium">1. 飯粒不完整、光澤不均勻</span>
@@ -59,10 +62,10 @@
                         <div onclick="setScore('appearance', 2, 10)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="2">
                             <span class="text-gray-700 font-medium">2. 飯粒不完整、光澤均勻</span>
                         </div>
-                        <div onclick="setScore('appearance', 3, 30)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center active" data-val="3">
+                        <div onclick="setScore('appearance', 3, 20)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center active" data-val="3">
                             <span class="text-gray-900 font-bold">3. 飯粒完整、光澤均勻</span>
                         </div>
-                        <div onclick="setScore('appearance', 4, 20)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="4">
+                        <div onclick="setScore('appearance', 4, 10)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="4">
                             <span class="text-gray-700 font-medium">4. 飯粒完整、光澤不均勻</span>
                         </div>
                     </div>
@@ -70,10 +73,13 @@
 
                 <!-- 二、口感 -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">2</span>
-                        二、口感 (Texture) <span class="text-sm font-normal text-gray-400 ml-2">權重: 40</span>
-                    </h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">2</span>
+                            二、口感 (Texture)
+                        </h2>
+                        <span class="text-xs font-bold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">權重: 40%</span>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="group-texture">
                         <div onclick="setScore('texture', 1, 0)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="1">
                             <span class="text-gray-700 font-medium">1. 極硬</span>
@@ -95,21 +101,24 @@
 
                 <!-- 三、老化程度 -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">3</span>
-                        三、老化程度 (Retrogradation) <span class="text-sm font-normal text-gray-400 ml-2">權重: 30</span>
-                    </h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-orange-700 text-white rounded-lg flex items-center justify-center text-sm">3</span>
+                            三、老化程度 (Retrogradation)
+                        </h2>
+                        <span class="text-xs font-bold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">權重: 40%</span>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="group-staling">
-                        <div onclick="setScore('staling', 1, 30)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center active" data-val="1">
+                        <div onclick="setScore('staling', 1, 40)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center active" data-val="1">
                             <span class="text-gray-900 font-bold">1. 完全無老化口感</span>
                         </div>
-                        <div onclick="setScore('staling', 2, 20)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="2">
+                        <div onclick="setScore('staling', 2, 30)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="2">
                             <span class="text-gray-700 font-medium">2. 些許老化</span>
                         </div>
-                        <div onclick="setScore('staling', 3, 10)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="3">
+                        <div onclick="setScore('staling', 3, 20)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="3">
                             <span class="text-gray-700 font-medium">3. 大部分老化</span>
                         </div>
-                        <div onclick="setScore('staling', 4, 0)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="4">
+                        <div onclick="setScore('staling', 4, 10)" class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center" data-val="4">
                             <span class="text-gray-700 font-medium">4. 完全老化</span>
                         </div>
                     </div>
@@ -134,14 +143,9 @@
 
                 <!-- 特性分析雷達圖 -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-gray-700 mb-4 tracking-tight">特性分析 (加權比例)</h3>
+                    <h3 class="font-bold text-gray-700 mb-4 tracking-tight">特性分析</h3>
                     <div class="w-full aspect-square">
                         <canvas id="radarChart"></canvas>
-                    </div>
-                    <div class="mt-4 grid grid-cols-3 text-[10px] text-gray-400 font-mono border-t pt-2 text-center">
-                        <div>外觀 Max:30</div>
-                        <div>口感 Max:40</div>
-                        <div>老化 Max:30</div>
                     </div>
                 </div>
 
@@ -157,7 +161,7 @@
     <script>
         let radarChart;
         const state = {
-            scores: { appearance: 30, texture: 40, staling: 30 }
+            scores: { appearance: 20, texture: 40, staling: 40 }
         };
 
         function initChart() {
@@ -165,9 +169,9 @@
             radarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['外觀 (30)', '口感 (40)', '老化程度 (30)'],
+                    labels: ['外觀', '口感', '老化程度'],
                     datasets: [{
-                        data: [30, 40, 30],
+                        data: [20, 40, 40],
                         backgroundColor: 'rgba(194, 65, 12, 0.1)',
                         borderColor: 'rgba(194, 65, 12, 1)',
                         borderWidth: 2,
@@ -184,7 +188,7 @@
                             ticks: { display: false, stepSize: 10 },
                             grid: { color: '#f3f4f6' },
                             pointLabels: { 
-                                font: { size: 13, weight: 'bold' },
+                                font: { size: 14, weight: 'bold' },
                                 color: '#4b5563'
                             }
                         }
@@ -230,9 +234,9 @@
             document.getElementById('assessor').value = '';
             document.getElementById('sampleId').value = '';
             document.getElementById('sampleEvaluation').value = '';
-            setScore('appearance', 3, 30);
+            setScore('appearance', 3, 20);
             setScore('texture', 3, 40);
-            setScore('staling', 1, 30);
+            setScore('staling', 1, 40);
         }
 
         function exportCSV() {
@@ -241,7 +245,7 @@
             const total = state.scores.appearance + state.scores.texture + state.scores.staling;
             const evalText = document.getElementById('sampleEvaluation').value.replace(/\n/g, " ").replace(/,/g, "，");
 
-            const headers = ["評測者", "樣品編號", "外觀(30)", "口感(40)", "老化程度(30)", "整體總分", "評價內容"];
+            const headers = ["評測者", "樣品編號", "外觀(20%)", "口感(40%)", "老化程度(40%)", "整體總分", "評價內容"];
             const dataRow = [
                 assessor,
                 sampleId,
