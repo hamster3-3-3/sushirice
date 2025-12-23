@@ -18,7 +18,8 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 3.5rem;
+            min-height: 4rem;
+            line-height: 1.4;
         }
         .score-btn.active { 
             background-color: #f97316; 
@@ -87,7 +88,29 @@
             '手卷': ['GP-01', 'GP-02', 'GP-03', 'GP-04']
         };
 
-        // 初始化所有數據空間
+        // 分數定義轉換表
+        const scoreMapping = {
+            appearance: {
+                1: 0,  // 飯粒不完整、光澤不均勻
+                2: 10, // 飯粒不完整、光澤均勻
+                3: 20, // 飯粒完整、光澤均勻
+                4: 10  // 飯粒完整、光澤不均勻
+            },
+            texture: {
+                1: 0,  // 極硬
+                2: 20, // 偏硬
+                3: 40, // 軟硬適中
+                4: 20, // 偏軟爛
+                5: 0   // 極軟爛
+            },
+            staling: {
+                1: 40, // 完全無老化
+                2: 30, // 些許老化
+                3: 20, // 大部分老化
+                4: 10  // 完全老化
+            }
+        };
+
         let allData = {};
         Object.keys(config).forEach(cat => {
             config[cat].forEach(id => {
@@ -118,8 +141,7 @@
 
         function switchId(id) {
             currentId = id;
-            const selector = document.getElementById('idSelector');
-            selector.value = id;
+            document.getElementById('idSelector').value = id;
             renderForm();
         }
 
@@ -138,10 +160,10 @@
                             </h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 ${renderScoreButtons('appearance', [
-                                    {v:1, t:'飯粒不完整 / 光澤不均'}, 
-                                    {v:2, t:'飯粒不完整 / 光澤均勻'}, 
-                                    {v:3, t:'飯粒完整 / 光澤均勻'}, 
-                                    {v:4, t:'飯粒完整 / 光澤不均'}
+                                    {v:1, t:'飯粒不完整、光澤不均勻'}, 
+                                    {v:2, t:'飯粒不完整、光澤均勻'}, 
+                                    {v:3, t:'飯粒完整、光澤均勻'}, 
+                                    {v:4, t:'飯粒完整、光澤不均勻'}
                                 ])}
                             </div>
                         </section>
@@ -154,7 +176,7 @@
                             </h3>
                             <div class="grid grid-cols-5 gap-3">
                                 ${renderScoreButtons('texture', [
-                                    {v:1, t:'極硬'}, {v:2, t:'偏硬'}, {v:3, t:'適中'}, {v:4, t:'偏軟'}, {v:5, t:'極軟'}
+                                    {v:1, t:'極硬'}, {v:2, t:'偏硬'}, {v:3, t:'軟硬適中'}, {v:4, t:'偏軟爛'}, {v:5, t:'極軟爛'}
                                 ])}
                             </div>
                         </section>
@@ -167,7 +189,7 @@
                             </h3>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 ${renderScoreButtons('staling', [
-                                    {v:1, t:'無老化'}, {v:2, t:'些許'}, {v:3, t:'大部分'}, {v:4, t:'完全'}
+                                    {v:1, t:'完全無老化'}, {v:2, t:'些許老化'}, {v:3, t:'大部分老化'}, {v:4, t:'完全老化'}
                                 ])}
                             </div>
                         </section>
@@ -179,7 +201,7 @@
                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-500"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                              綜合感官評語
                         </h3>
-                        <textarea oninput="updateComment(this.value)" class="w-full h-64 p-4 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-inner bg-white" placeholder="描述飯粒黏性、風味、醋味平衡等...">${data.comment}</textarea>
+                        <textarea oninput="updateComment(this.value)" class="w-full h-64 p-4 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-inner bg-white" placeholder="描述飯粒黏性、風味、平衡度等...">${data.comment}</textarea>
                     </div>
                 </div>
             `;
@@ -206,18 +228,24 @@
 
         function exportCSV() {
             const name = document.getElementById('assessorName').value || '未具名';
-            let csv = "\uFEFF分類,樣品編號,評測者,外觀評分,口感評分,老化評分,備註評語\n";
+            let csv = "\uFEFF分類,樣品編號,評測者,外觀得分,口感得分,老化得分,總分,備註評語\n";
             
             Object.values(allData).forEach(d => {
+                // 只有填過資料的才匯出
                 if(d.appearance || d.texture || d.staling || d.comment) {
-                    csv += `"${d.category}","${d.id}","${name}","${d.appearance || '-'}","${d.texture || '-'}","${d.staling || '-'}","${d.comment.replace(/"/g, '""')}"\n`;
+                    const sApp = d.appearance ? scoreMapping.appearance[d.appearance] : 0;
+                    const sTex = d.texture ? scoreMapping.texture[d.texture] : 0;
+                    const sSta = d.staling ? scoreMapping.staling[d.staling] : 0;
+                    const total = sApp + sTex + sSta;
+
+                    csv += `"${d.category}","${d.id}","${name}","${sApp}","${sTex}","${sSta}","${total}","${d.comment.replace(/"/g, '""')}"\n`;
                 }
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `感官評測報告_${name}_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `壽司評測_${name}_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
         }
 
