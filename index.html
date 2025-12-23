@@ -82,10 +82,14 @@
     </div>
 
     <script>
+        // 更新後的樣品編號配置
+        const sampleIds = ['A(D+1)', 'A(D+2)', 'B(D+1)', 'B(D+2)'];
+        const categories = ['細卷', '脆卷', '手卷'];
+
         const config = {
-            '細卷': ['WR-01', 'WR-02', 'WR-03', 'WR-04'],
-            '脆卷': ['FD-01', 'FD-02', 'FD-03', 'FD-04'],
-            '手卷': ['GP-01', 'GP-02', 'GP-03', 'GP-04']
+            '細卷': [...sampleIds],
+            '脆卷': [...sampleIds],
+            '手卷': [...sampleIds]
         };
 
         // 分數定義轉換表
@@ -112,9 +116,11 @@
         };
 
         let allData = {};
-        Object.keys(config).forEach(cat => {
-            config[cat].forEach(id => {
-                allData[id] = {
+        // 初始化數據結構，鍵值採用 "類別_編號" 確保唯一性
+        categories.forEach(cat => {
+            sampleIds.forEach(id => {
+                const key = `${cat}_${id}`;
+                allData[key] = {
                     category: cat,
                     id: id,
                     appearance: null,
@@ -126,7 +132,7 @@
         });
 
         let currentCategory = '細卷';
-        let currentId = 'WR-01';
+        let currentId = 'A(D+1)';
 
         function switchCategory(cat) {
             currentCategory = cat;
@@ -147,7 +153,8 @@
 
         function renderForm() {
             const container = document.getElementById('formContent');
-            const data = allData[currentId];
+            const dataKey = `${currentCategory}_${currentId}`;
+            const data = allData[dataKey];
             
             container.innerHTML = `
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -208,7 +215,8 @@
         }
 
         function renderScoreButtons(field, options) {
-            const currentVal = allData[currentId][field];
+            const dataKey = `${currentCategory}_${currentId}`;
+            const currentVal = allData[dataKey][field];
             return options.map(opt => `
                 <button onclick="setScore('${field}', ${opt.v})" 
                         class="score-btn p-3 rounded-xl text-sm font-bold ${currentVal === opt.v ? 'active' : ''}">
@@ -218,12 +226,14 @@
         }
 
         function setScore(field, val) {
-            allData[currentId][field] = val;
+            const dataKey = `${currentCategory}_${currentId}`;
+            allData[dataKey][field] = val;
             renderForm();
         }
 
         function updateComment(val) {
-            allData[currentId].comment = val;
+            const dataKey = `${currentCategory}_${currentId}`;
+            allData[dataKey].comment = val;
         }
 
         function exportCSV() {
