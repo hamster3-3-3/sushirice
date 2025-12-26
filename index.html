@@ -223,9 +223,10 @@
       return `"${s.replace(/"/g, '""')}"`;
     }
 
+    // ✅ 已修改：CSV 欄位順序改成「分類,評測者,樣品編號,外觀得分,口感得分,老化得分,總分,備註」
     function buildCsvPayload(assessorName) {
       const name = (assessorName || '').trim() || '未具名';
-      let csv = "\uFEFF分類,樣品編號,評測者,外觀得分,口感得分,老化得分,總分,備註\n";
+      let csv = "\uFEFF分類,評測者,樣品編號,外觀得分,口感得分,老化得分,總分,備註\n";
 
       Object.values(allData).forEach((d) => {
         const hasAny = Boolean(d.appearance || d.texture || d.staling || (d.comment && d.comment.trim() !== ''));
@@ -238,8 +239,8 @@
 
         csv += [
           escapeCsvCell(d.category),
-          escapeCsvCell(d.id),
           escapeCsvCell(name),
+          escapeCsvCell(d.id),
           escapeCsvCell(a),
           escapeCsvCell(t),
           escapeCsvCell(s),
@@ -335,7 +336,6 @@
     }
 
     // ====== 提交表單：只要送出成功就提示「提交成功」 ======
-    // 你目前的期望：提交成功就提示，不需要下載、不需要回傳 fileId
     async function submitForm() {
       const assessor = document.getElementById('assessorName').value;
       const { blob, filename } = buildCsvPayload(assessor);
@@ -362,8 +362,8 @@
       const maxTotal = 20 + 40 + 40;
       assert('最大總分應為 100', maxTotal === 100);
 
-      // Test 3: CSV header contains BOM and newline
-      const header = "\uFEFF分類,樣品編號,評測者,外觀得分,口感得分,老化得分,總分,備註\n";
+      // Test 3: CSV header contains BOM and newline (updated header)
+      const header = "\uFEFF分類,評測者,樣品編號,外觀得分,口感得分,老化得分,總分,備註\n";
       assert('CSV header 以 BOM 開頭', header.charCodeAt(0) === 0xFEFF);
       assert('CSV header 以換行結尾', header.endsWith('\n'));
 
@@ -372,12 +372,10 @@
       assert('CSV cell 雙引號轉義', cell === '"a""b"');
 
       // Test 5: buildCsvPayload with empty data should contain only header
-      // 先備份 allData 並清空
       const backup = allData;
       allData = {};
       const p = buildCsvPayload('測試者');
       assert('空資料 CSV 應只含 header', p.csv === header);
-      // 還原
       allData = backup;
 
       // Test 6: submitForm function exists
