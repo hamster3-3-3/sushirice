@@ -44,13 +44,21 @@
   <div class="max-w-4xl mx-auto">
     <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center border-t-4 border-orange-500">
       <h1 class="text-2xl font-black text-slate-800">壽司飯感官評測系統</h1>
-      <div class="mt-4 md:mt-0 flex flex-col items-end gap-3">
-        <input
-          type="text"
-          id="assessorName"
-          placeholder="填寫評測者姓名"
-          class="border-b border-slate-300 p-2 focus:border-orange-500 outline-none text-right w-48 bg-transparent"
-        />
+      <div class="mt-4 md:mt-0 flex flex-col items-end gap-2">
+        <!-- ✅ 姓名必填 + 顯示（必填） -->
+        <div class="w-56">
+          <label class="block text-xs font-bold text-slate-500 mb-1 text-right">評測者姓名（必填）</label>
+          <input
+            type="text"
+            id="assessorName"
+            required
+            placeholder="填寫評測者姓名"
+            class="border-b border-slate-300 p-2 focus:border-orange-500 outline-none text-right w-full bg-transparent"
+            aria-required="true"
+          />
+          <p id="assessorError" class="mt-1 text-xs text-red-500 text-right hidden">請填寫評測者姓名（必填）。</p>
+        </div>
+
         <button
           onclick="submitForm()"
           class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-900 transition text-sm"
@@ -109,6 +117,22 @@
 
     let currentCategory = '細卷';
     let currentId = 'A';
+
+    // ✅ 輔助：姓名必填驗證（含提示）
+    function validateAssessorOrBlock() {
+      const el = document.getElementById('assessorName');
+      const err = document.getElementById('assessorError');
+      const name = (el?.value || '').trim();
+
+      if (!name) {
+        if (err) err.classList.remove('hidden');
+        el?.focus();
+        alert('請先填寫評測者姓名（必填）');
+        return null;
+      }
+      if (err) err.classList.add('hidden');
+      return name;
+    }
 
     function switchCategory(cat) {
       currentCategory = cat;
@@ -336,9 +360,11 @@
       }
     }
 
-    // ====== 提交表單：只要送出成功就提示「提交成功」 ======
+    // ====== 提交表單：姓名必填；缺少姓名則阻擋提交 ======
     async function submitForm() {
-      const assessor = document.getElementById('assessorName').value;
+      const assessor = validateAssessorOrBlock();
+      if (!assessor) return;
+
       const { blob, filename } = buildCsvPayload(assessor);
 
       try {
@@ -399,6 +425,15 @@
     window.onload = () => {
       runSelfTests();
       switchCategory('細卷');
+
+      // ✅ 使用者開始輸入姓名就隱藏錯誤提示
+      const el = document.getElementById('assessorName');
+      if (el) {
+        el.addEventListener('input', () => {
+          const err = document.getElementById('assessorError');
+          if (err) err.classList.add('hidden');
+        });
+      }
     };
   </script>
 </body>
