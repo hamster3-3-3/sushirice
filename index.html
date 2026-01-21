@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>壽司飯感官評測系統</title>
+  <title>壽司感官評測系統</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -43,23 +44,9 @@
 <body class="p-4 md:p-8">
   <div class="max-w-4xl mx-auto">
     <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center border-t-4 border-orange-500">
-      <h1 class="text-2xl font-black text-slate-800">壽司飯感官評測系統</h1>
-      <div class="mt-4 md:mt-0 flex flex-col items-end gap-2">
-        <!-- ✅ 姓名必填 + 顯示（必填） -->
-        <div class="w-56">
-          <label class="block text-xs font-bold text-slate-500 mb-1 text-right">評測者姓名（必填）</label>
-          <input
-            type="text"
-            id="assessorName"
-            required
-            placeholder="填寫評測者姓名"
-            class="border-b border-slate-300 p-2 focus:border-orange-500 outline-none text-right w-full bg-transparent"
-            aria-required="true"
-          />
-          <p id="assessorError" class="mt-1 text-xs text-red-500 text-right hidden">請填寫評測者姓名（必填）。</p>
-        </div>
-
-        <button
+      <h1 class="text-2xl font-black text-slate-800">壽司感官評測系統</h1>
+      <div class="mt-4 md:mt-0 flex flex-row items-center gap-3">
+<button
           onclick="submitForm()"
           class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-900 transition text-sm"
         >
@@ -68,10 +55,31 @@
       </div>
     </div>
 
+
+    <!-- 評測者姓名（獨立區塊） -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">評測者 ASSESSOR（必填）</label>
+          <input
+            type="text"
+            id="assessorName"
+            required
+            placeholder="填寫評測者姓名"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            aria-required="true"
+          />
+          <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">請填寫評測者姓名（必填）。</p>
+        </div>
+        <div class="text-sm text-slate-500 leading-relaxed">
+          切換 A/B 樣品時系統會自動保留您的選擇與筆記。
+        </div>
+      </div>
+    </div>
+
     <div class="flex bg-slate-100 rounded-t-xl overflow-hidden shadow-inner">
-      <button onclick="switchCategory('細卷')" id="tab-細卷" class="tab-btn flex-1 active">細卷系列</button>
-      <button onclick="switchCategory('脆卷')" id="tab-脆卷" class="tab-btn flex-1">脆卷系列</button>
-      <button onclick="switchCategory('手卷')" id="tab-手卷" class="tab-btn flex-1">手卷系列</button>
+      <button onclick="switchCategory('雙手卷')" id="tab-雙手卷" class="tab-btn flex-1 active">雙手卷系列</button>
+      <button onclick="switchCategory('稻荷')" id="tab-稻荷" class="tab-btn flex-1">稻荷系列</button>
     </div>
 
     <div class="bg-white rounded-b-xl shadow-lg border border-slate-200 overflow-hidden">
@@ -96,18 +104,17 @@
 
     // ====== 表單配置 ======
     // ✅ 已修改：樣品編號統一為 A/B/C/D（四個）
-    const sampleIds = ['A', 'B', 'C', 'D'];
-    const categories = ['細卷', '脆卷', '手卷'];
+    const sampleIds = ['A', 'B'];
+    const categories = ['雙手卷', '稻荷'];
     const config = {
-      '細卷': [...sampleIds],
-      '脆卷': [...sampleIds],
-      '手卷': [...sampleIds]
+      '雙手卷': [...sampleIds],
+      '稻荷': [...sampleIds]
     };
 
     const scoreMapping = {
-      appearance: { 1: 0, 2: 10, 3: 20, 4: 10 },
+      appearance: { 1: 0, 2: 20, 3: 40, 4: 20 },
       texture: { 1: 0, 2: 20, 3: 40, 4: 20, 5: 0 },
-      staling: { 1: 40, 2: 30, 3: 20, 4: 10 }
+      staling: { 1: 20, 2: 10, 3: 5, 4: 0 }
     };
 
     let allData = {};
@@ -115,7 +122,7 @@
       allData[`${c}_${id}`] = { category: c, id, appearance: null, texture: null, staling: null, comment: '' };
     }));
 
-    let currentCategory = '細卷';
+    let currentCategory = '雙手卷';
     let currentId = 'A';
 
     // ✅ 輔助：姓名必填驗證（含提示）
@@ -177,10 +184,10 @@
               <h3 class='font-bold mb-4'>外觀</h3>
               <div class='grid grid-cols-2 gap-4'>
                 ${renderScoreButtons('appearance', [
-                  { v: 1, t: '飯粒不完整、光澤不均勻' },
-                  { v: 2, t: '飯粒不完整、光澤均勻' },
-                  { v: 3, t: '飯粒完整、光澤均勻' },
-                  { v: 4, t: '飯粒完整、光澤不均勻' }
+                  { v: 1, t: '米飯破裂、輾壓感過糊爛' },
+                  { v: 2, t: '米飯破裂、輾壓感偏糊爛' },
+                  { v: 3, t: '米飯完整、無明顯輾壓感' },
+                  { v: 4, t: '米飯完整、輾壓感偏糊爛' }
                 ])}
               </div>
             </section>
@@ -199,10 +206,10 @@
             </section>
 
             <section>
-              <h3 class='font-bold mb-4'>老化</h3>
+              <h3 class='font-bold mb-4'>老化程度</h3>
               <div class='grid grid-cols-4 gap-3'>
                 ${renderScoreButtons('staling', [
-                  { v: 1, t: '完全無老化' },
+                  { v: 1, t: '完全無老化口感' },
                   { v: 2, t: '些許老化' },
                   { v: 3, t: '大部分老化' },
                   { v: 4, t: '完全老化' }
@@ -216,7 +223,7 @@
             <textarea
               oninput="updateComment(this.value)"
               class='w-full h-64 border p-3 rounded bg-white'
-              placeholder='描述飯粒黏性、風味、平衡度等...'
+              placeholder='描述整體口感、風味、平衡度等...'
             >${escapeHtmlText(d.comment || '')}</textarea>
           </div>
         </div>
@@ -275,7 +282,7 @@
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const filename = `壽司評測_${name}_${todayISO()}.csv`;
+      const filename = `壽司感官評測_${name}_${todayISO()}.csv`;
       return { name, csv, blob, filename };
     }
 
@@ -424,7 +431,7 @@
 
     window.onload = () => {
       runSelfTests();
-      switchCategory('細卷');
+      switchCategory('雙手卷');
 
       // ✅ 使用者開始輸入姓名就隱藏錯誤提示
       const el = document.getElementById('assessorName');
