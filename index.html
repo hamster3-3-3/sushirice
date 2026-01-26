@@ -112,7 +112,7 @@
     };
 
     const scoreMapping = {
-      appearance: { 1: 0, 2: 20, 3: 40, 4: 20 },
+      appearance: { 1: 20, 2: 40 },
       texture: { 1: 0, 2: 20, 3: 40, 4: 20, 5: 0 },
       staling: { 1: 20, 2: 10, 3: 5, 4: 0 }
     };
@@ -185,9 +185,7 @@
               <div class='grid grid-cols-2 gap-4'>
                 ${renderScoreButtons('appearance', [
                   { v: 1, t: '米飯破裂' },
-                  { v: 2, t: '米飯破裂' },
-                  { v: 3, t: '米飯完整' },
-                  { v: 4, t: '米飯完整' }
+                  { v: 2, t: '米飯完整' }
                 ])}
               </div>
             </section>
