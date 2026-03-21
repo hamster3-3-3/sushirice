@@ -91,7 +91,7 @@
          * 按下「提交表單」時：
          *  - 透過 Google Apps Script Web App 上傳到 Google Drive
          */
-        const DRIVE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw-RUOruPvni0M37kDhtulr99Q4YwD-Sm9Jp9vNZfrHtfedQL2puekcX9bDSOpU9TWH/exec";
+        const DRIVE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyOagZ0NOt-AEe6-Y1QUS5Ls_vmpVUO4bshpuExitE9ib7Q2zIMLFa609A5C6e_RgAr3A/exec";
         const UPLOAD_TOKEN = "rice_test_2025";
 
         const sampleOptions = {
@@ -392,6 +392,11 @@ ${criteriaHtml}
         }
 
         
+
+        function csvToBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
         function exportCSV() {
             const assessor = validateAssessorOrBlock();
             if (!assessor) return;
@@ -430,42 +435,55 @@ ${criteriaHtml}
         }
 
 
+        
         async function uploadCSVToDrive({ csvContent, filename, assessor }) {
             if (!DRIVE_WEBAPP_URL) {
                 alert('尚未設定 DRIVE_WEBAPP_URL，因此無法上傳到雲端硬碟。');
                 return;
             }
 
-            const payload = {
-                token: UPLOAD_TOKEN,
-                filename,
-                assessor,
-                csv: csvContent
-            };
-
-            const formBody = new URLSearchParams({ payload: JSON.stringify(payload) });
-
             try {
-                const res = await fetch(DRIVE_WEBAPP_URL, {
-                    method: 'POST',
-                    body: formBody
-                });
+                const base64 = csvToBase64(csvContent);
 
-                const raw = await res.text();
-                let out;
-                try { out = JSON.parse(raw); } catch { out = { ok: false, message: raw }; }
+                const iframeName = 'upload_iframe_' + Date.now();
+                const iframe = document.createElement('iframe');
+                iframe.name = iframeName;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
 
-                if (!res.ok || !out.ok) {
-                    throw new Error(out.message || 'Upload failed');
-                }
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = DRIVE_WEBAPP_URL;
+                form.target = iframeName;
+                form.style.display = 'none';
 
-                alert('提交成功');
+                const addField = (name, value) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name;
+                    input.value = value;
+                    form.appendChild(input);
+                };
+
+                addField('filename', filename);
+                addField('base64', base64);
+
+                document.body.appendChild(form);
+                form.submit();
+
+                setTimeout(() => {
+                    form.remove();
+                    iframe.remove();
+                }, 5000);
+
+                alert('表單已送出，請稍候至 Google 雲端資料夾確認檔案是否上傳成功。');
                 clearAllAfterSubmit();
             } catch (err) {
                 console.error(err);
                 alert('上傳失敗：' + (err?.message || err));
             }
         }
+
 
         function runTests() {
             const log = (msg) => {
