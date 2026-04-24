@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>二期米成品測試盲測表單</title>
+    <title>4/28炊飯向上盲測表單</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -23,7 +23,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-800 pb-6">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">二期米成品測試盲測表單</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">4/28炊飯向上盲測表單</h1>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap justify-center gap-3">
                 <button onclick="exportCSV()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2">
@@ -51,7 +51,7 @@
                 >
                 <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">請先填寫評測者姓名（必填）。</p>
             </div>
-            <p class="text-gray-400 text-sm hidden md:block">切換 A/B 樣品時系統會自動保留您的選擇與筆記。</p>
+            <p class="text-gray-400 text-sm hidden md:block">切換 A/B 樣品時系統會自動保留您的評分與勾選項目。</p>
         </div>
 
         <!-- 品項切換區 -->
@@ -64,7 +64,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品類別</label>
-                        <div class="text-2xl font-black text-gray-900 p-1">香腸腿排雙拼便當</div>
+                        <div class="text-2xl font-black text-gray-900 p-1">鮪魚飯糰</div>
                     </div>
                     <div class="w-full md:w-64">
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品編號</label>
@@ -96,18 +96,25 @@
 
         const sampleOptions = {
             A: "A",
-            B: "B"
+            B: "B",
+            C: "C"
         };
 
         const categories = [
-            "香腸腿排雙拼便當",
-            "極上炙烤親子丼",
             "鮪魚飯糰",
             "肉鬆飯糰",
-            "海饌雙手捲",
             "熟成紅鮭飯糰",
-            "香辣醬蒜味香腸蛋炒飯"
+            "雞肉飯糰",
+            "低溫便當飯"
         ];
+
+        const categorySamples = {
+            "低溫便當飯": ["A", "B", "C"]
+        };
+
+        function getSampleCodes(catName) {
+            return categorySamples[catName] || ["A", "B"];
+        }
 
         const criteria = [
             {
@@ -116,9 +123,15 @@
                 titleEn: "Color / Appearance",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 100, text: "1. 良好(米飯有光澤)" },
-                    { val: 2, score: 70, text: "2. 普通(無意見)" },
-                    { val: 3, score: 50, text: "3. 不良(顏色黯淡)" }
+                    { val: 1, score: 100, text: "1. 良好" },
+                    { val: 2, score: 70, text: "2. 普通" },
+                    { val: 3, score: 50, text: "3. 不良" }
+                ],
+                checkOptions: [
+                    "有光澤", "無光澤", "白色", "黃色",
+                    "米粒輪廓清晰", "米粒表面凹凸不平，看起來模糊",
+                    "胚芽明顯", "背線明顯", "碎米明顯",
+                    "米飯沒壓爛", "米粒大", "米粒小"
                 ]
             },
             {
@@ -127,9 +140,13 @@
                 titleEn: "Aroma",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 100, text: "1. 濃(米飯特有香氣)" },
-                    { val: 2, score: 70, text: "2. 普通(無意見)" },
-                    { val: 3, score: 50, text: "3. 淡(米糠臭味或添加物酸味)" }
+                    { val: 1, score: 100, text: "1. 濃" },
+                    { val: 2, score: 70, text: "2. 普通" },
+                    { val: 3, score: 50, text: "3. 淡" }
+                ],
+                checkOptions: [
+                    "米飯有良好的氣味", "有米糠臭味",
+                    "有米糠臭味以外的異味", "添加物等的酸臭味濃郁"
                 ]
             },
             {
@@ -138,9 +155,14 @@
                 titleEn: "Grain Sensation",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 100, text: "1. 良好(口中可以明確感受1粒1粒)" },
-                    { val: 2, score: 70, text: "2. 普通(無意見)" },
-                    { val: 3, score: 50, text: "3. 不良(米粒破碎，整體黏糊)" }
+                    { val: 1, score: 100, text: "1. 良好" },
+                    { val: 2, score: 70, text: "2. 普通" },
+                    { val: 3, score: 50, text: "3. 不良" }
+                ],
+                checkOptions: [
+                    "口中可以明顯感受到1粒1粒",
+                    "口中無法明顯感受到米粒",
+                    "整體黏糊"
                 ]
             },
             {
@@ -149,9 +171,14 @@
                 titleEn: "Firmness",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 70, text: "1. 硬(口感偏硬)" },
-                    { val: 2, score: 100, text: "2. 適中(軟硬適中)" },
-                    { val: 3, score: 70, text: "3. 軟(口感偏軟)" }
+                    { val: 1, score: 70, text: "1. 硬" },
+                    { val: 2, score: 100, text: "2. 適中" },
+                    { val: 3, score: 70, text: "3. 軟" }
+                ],
+                checkOptions: [
+                    "太硬", "稍硬", "稍軟", "太軟",
+                    "咀嚼時感受到彈性", "咀嚼時無感受到彈性",
+                    "感受到老化", "無感受老化", "米心未熟"
                 ]
             },
             {
@@ -160,9 +187,13 @@
                 titleEn: "Taste",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 100, text: "1. 良好(能感受到米飯甜味)" },
-                    { val: 2, score: 70, text: "2. 普通(無意見)" },
-                    { val: 3, score: 50, text: "3. 不良(米飯本身有酸臭味)" }
+                    { val: 1, score: 100, text: "1. 良好" },
+                    { val: 2, score: 70, text: "2. 普通" },
+                    { val: 3, score: 50, text: "3. 不良" }
+                ],
+                checkOptions: [
+                    "美味", "不美味", "感受到米飯甜味",
+                    "無感受到米飯甜味", "米飯味道淡", "感受到火力不足"
                 ]
             },
             {
@@ -171,12 +202,77 @@
                 titleEn: "Viscosity",
                 gridClass: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
                 options: [
-                    { val: 1, score: 100, text: "1. 良好(黏度剛剛好)" },
-                    { val: 2, score: 70, text: "2. 普通(無意見)" },
-                    { val: 3, score: 50, text: "3. 不良(口感乾硬乾燥)" }
+                    { val: 1, score: 100, text: "1. 良好" },
+                    { val: 2, score: 70, text: "2. 普通" },
+                    { val: 3, score: 50, text: "3. 不良" }
+                ],
+                checkOptions: [
+                    "太黏", "黏性稍微強一點",
+                    "沒有黏性", "黏性稍微弱一點",
+                    "乾散"
                 ]
             }
         ];
+
+        const evaluationKeys = criteria.map(item => item.key);
+
+        function createBlankEvaluation() {
+            const evaluation = {};
+            evaluationKeys.forEach(key => {
+                evaluation[key] = [];
+            });
+            return evaluation;
+        }
+
+        function createBlankNotes() {
+            const notes = {};
+            evaluationKeys.forEach(key => {
+                notes[key] = '';
+            });
+            return notes;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function getCriterionByKey(itemKey) {
+            return criteria.find(c => c.key === itemKey);
+        }
+
+        function getSelectedCheckText(itemKey, selectedValues) {
+            if (!Array.isArray(selectedValues) || !selectedValues.length) return '';
+            const criterion = getCriterionByKey(itemKey);
+            if (!criterion) return '';
+            return selectedValues
+                .filter(v => criterion.checkOptions.includes(v))
+                .join('、');
+        }
+
+        function renderCheckOptions(itemKey, selectedValues) {
+            const criterion = getCriterionByKey(itemKey);
+            if (!criterion || !Array.isArray(criterion.checkOptions)) return '';
+            const selectedSet = new Set(Array.isArray(selectedValues) ? selectedValues : []);
+            return criterion.checkOptions.map(option => {
+                const checked = selectedSet.has(option);
+                return `
+                    <label class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-sm cursor-pointer transition ${checked ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-800 border-gray-200 hover:bg-white'}">
+                        <input
+                            type="checkbox"
+                            class="h-4 w-4 accent-gray-900"
+                            ${checked ? 'checked' : ''}
+                            onchange="toggleCheckOption('${itemKey}', '${escapeHtml(option)}', this.checked)"
+                        >
+                        <span>${escapeHtml(option)}</span>
+                    </label>
+                `;
+            }).join('');
+        }
 
         let dataStore = {};
         let currentCategoryIdx = 0;
@@ -188,17 +284,19 @@
                 scores[item.key] = 0;
                 valIdx[item.key] = null;
             });
-            return { scores, evaluation: { color: '', aroma: '', grain: '', firmness: '', taste: '', viscosity: '' }, valIdx };
+            return { scores, evaluation: createBlankEvaluation(), notes: createBlankNotes(), valIdx };
         }
 
         function initDataStore() {
             dataStore = {};
             categories.forEach(cat => {
+                const sampleCodes = getSampleCodes(cat);
                 dataStore[cat] = {
-                    currentSelection: "A",
-                    A: blankSampleState(),
-                    B: blankSampleState()
+                    currentSelection: sampleCodes[0]
                 };
+                sampleCodes.forEach(code => {
+                    dataStore[cat][code] = blankSampleState();
+                });
             });
         }
 
@@ -271,21 +369,24 @@
                             currentData.valIdx[item.key] === opt.val
                         )).join('')}
                     </div>
-                    <div class="mt-3">
+                    <div class="mt-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">感受到的項目</label>
+                        <div class="flex flex-wrap gap-2">
+                            ${renderCheckOptions(item.key, currentData.evaluation?.[item.key] || [])}
+                        </div>
+                    </div>
+                    <div class="mt-4">
                         <label class="block text-sm font-bold text-gray-700 mb-2">說明</label>
                         <input
                             type="text"
-                            value="${(currentData.evaluation && currentData.evaluation[item.key]) || ''}"
+                            value="${escapeHtml(currentData.notes?.[item.key] || '')}"
                             oninput="updateItemNote('${item.key}', this.value)"
                             class="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-400 outline-none"
-                            placeholder="請輸入說明"
+                            placeholder="可自由輸入其他觀察或補充說明"
                         >
                     </div>
                 </div>
             `).join('');
-
-            const totalRaw = Object.values(currentData.scores).reduce((a, b) => a + b, 0);
-            const totalPercent = Math.round((totalRaw / 600) * 1000) / 10;
 
             container.innerHTML = `
                 <div class="sample-form space-y-6">
@@ -299,21 +400,45 @@
                             <div class="relative">
                                 <select onchange="toggleSampleVersion('${catName}', this.value)"
                                         class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-bold text-gray-900 outline-none cursor-pointer">
-                                    <option value="A" ${currentVersion === 'A' ? 'selected' : ''}>${sampleOptions.A}</option>
-                                    <option value="B" ${currentVersion === 'B' ? 'selected' : ''}>${sampleOptions.B}</option>
+                                    ${getSampleCodes(catName).map(code => `
+                                        <option value="${code}" ${currentVersion === code ? 'selected' : ''}>${sampleOptions[code]}</option>
+                                    `).join('')}
                                 </select>
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                             </div>
                         </div>
                     </div>
+                    ${criteriaHtml}
 
-${criteriaHtml}
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-gray-900 text-white rounded flex items-center justify-center text-xs">總</span>
+                            綜合評價
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            ${renderOverallCard(catName, 'A', 'A（良好）', currentData.overallEvaluation === 'A')}
+                            ${renderOverallCard(catName, 'B', 'B（普通）', currentData.overallEvaluation === 'B')}
+                            ${renderOverallCard(catName, 'C', 'C（不良）', currentData.overallEvaluation === 'C')}
+                        </div>
+                    </div>
                 </div>
             `;
         }
 
 
-        function renderScoreCard(catName, category, val, score, text, isActive) {
+        
+        function renderOverallCard(catName, val, label, isActive) {
+            const activeClass = isActive ? 'active' : '';
+            const fontClass = isActive ? 'font-bold text-gray-900' : 'text-gray-700 font-medium';
+            return `
+                <div onclick="updateOverallEvaluation('${catName}', '${val}')"
+                     class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center ${activeClass}">
+                    <span class="${fontClass}">${label}</span>
+                </div>
+            `;
+        }
+
+function renderScoreCard(catName, category, val, score, text, isActive) {
             const activeClass = isActive ? 'active' : '';
             const fontClass = isActive ? 'font-bold text-gray-900' : 'text-gray-700 font-medium';
             return `
@@ -333,13 +458,40 @@ ${criteriaHtml}
 
 
 
-        function updateItemNote(itemKey, value) {
+        function toggleCheckOption(itemKey, option, checked) {
             const catName = categories[currentCategoryIdx];
             const version = dataStore[catName].currentSelection;
             if (!dataStore[catName][version].evaluation || typeof dataStore[catName][version].evaluation !== 'object') {
-                dataStore[catName][version].evaluation = { color: '', aroma: '', grain: '', firmness: '', taste: '', viscosity: '' };
+                dataStore[catName][version].evaluation = createBlankEvaluation();
             }
-            dataStore[catName][version].evaluation[itemKey] = value;
+
+            const currentValues = Array.isArray(dataStore[catName][version].evaluation[itemKey])
+                ? [...dataStore[catName][version].evaluation[itemKey]]
+                : [];
+
+            const nextValues = checked
+                ? Array.from(new Set([...currentValues, option]))
+                : currentValues.filter(v => v !== option);
+
+            dataStore[catName][version].evaluation[itemKey] = nextValues;
+            renderCurrentForm();
+        }
+
+
+
+        function updateOverallEvaluation(catName, value) {
+            const version = dataStore[catName].currentSelection;
+            dataStore[catName][version].overallEvaluation = value;
+            renderCurrentForm();
+        }
+
+        function updateItemNote(itemKey, value) {
+            const catName = categories[currentCategoryIdx];
+            const version = dataStore[catName].currentSelection;
+            if (!dataStore[catName][version].notes || typeof dataStore[catName][version].notes !== 'object') {
+                dataStore[catName][version].notes = createBlankNotes();
+            }
+            dataStore[catName][version].notes[itemKey] = value;
         }
 
 
@@ -391,62 +543,95 @@ ${criteriaHtml}
             return val;
         }
 
-        
+
 
         function csvToBase64(str) {
             return btoa(unescape(encodeURIComponent(str)));
         }
 
 
+
+        function getOverallEvaluationLabel(value) {
+            const overallMap = { A: 'A(100)', B: 'B(70)', C: 'C(50)' };
+            return overallMap[value] || '';
+        }
+
         function getOptionLabelWithScore(itemKey, val, score) {
             const criterion = criteria.find(c => c.key === itemKey);
-            if (!criterion) return score || '';
+            if (!criterion) return String(score ?? '');
             const option = criterion.options.find(opt => String(opt.val) === String(val));
-            if (!option) return score || '';
+            if (!option) return String(score ?? '');
             let label = option.text || '';
             label = label.replace(/^\d+\.\s*/, '');
+            label = label.replace(/\([^()]*\)/g, '').trim();
             return `${label}(${option.score})`;
         }
 
+        
         function exportCSV() {
             const assessor = validateAssessorOrBlock();
             if (!assessor) return;
 
-            const headers = ['品項', '評測者', '樣品代號', '顏色(外觀)得分', '顏色(外觀)說明', '香氣(飯香)得分', '香氣(飯香)說明', '粒感得分', '粒感說明', '軟硬度得分', '軟硬度說明', '味道得分', '味道說明', '黏度得分', '黏度說明', '總分(百分制)'];
+            const headers = [
+                '品項', '評測者', '樣品代號',
+                '顏色(外觀)得分', '顏色(外觀)感受到項目', '顏色(外觀)說明',
+                '香氣(飯香)得分', '香氣(飯香)感受到項目', '香氣(飯香)說明',
+                '粒感得分', '粒感感受到項目', '粒感說明',
+                '軟硬度得分', '軟硬度感受到項目', '軟硬度說明',
+                '味道得分', '味道感受到項目', '味道說明',
+                '黏度得分', '黏度感受到項目', '黏度說明',
+                '綜合評價'
+            ];
 
             const rows = [];
             categories.forEach(cat => {
-                ['A', 'B'].forEach(ver => {
-                    const d = dataStore[cat][ver];
-                    const total = Number(d.scores.color || 0) + Number(d.scores.aroma || 0) + Number(d.scores.grain || 0) + Number(d.scores.firmness || 0) + Number(d.scores.taste || 0) + Number(d.scores.viscosity || 0);
-                    const totalPercent = Math.round((total / 600) * 1000) / 10;
+                getSampleCodes(cat).forEach(ver => {
+                    const d = dataStore[cat][ver] || {};
                     rows.push([
                         cat,
                         assessor,
                         ver,
-                        getOptionLabelWithScore('color', d.valIdx?.color, d.scores.color), d.evaluation?.color || '',
-                        getOptionLabelWithScore('aroma', d.valIdx?.aroma, d.scores.aroma), d.evaluation?.aroma || '',
-                        getOptionLabelWithScore('grain', d.valIdx?.grain, d.scores.grain), d.evaluation?.grain || '',
-                        getOptionLabelWithScore('firmness', d.valIdx?.firmness, d.scores.firmness), d.evaluation?.firmness || '',
-                        getOptionLabelWithScore('taste', d.valIdx?.taste, d.scores.taste), d.evaluation?.taste || '',
-                        getOptionLabelWithScore('viscosity', d.valIdx?.viscosity, d.scores.viscosity), d.evaluation?.viscosity || '',
-                        totalPercent
+
+                        getOptionLabelWithScore('color', d.valIdx?.color, d.scores?.color),
+                        getSelectedCheckText('color', d.evaluation?.color),
+                        d.notes?.color || '',
+
+                        getOptionLabelWithScore('aroma', d.valIdx?.aroma, d.scores?.aroma),
+                        getSelectedCheckText('aroma', d.evaluation?.aroma),
+                        d.notes?.aroma || '',
+
+                        getOptionLabelWithScore('grain', d.valIdx?.grain, d.scores?.grain),
+                        getSelectedCheckText('grain', d.evaluation?.grain),
+                        d.notes?.grain || '',
+
+                        getOptionLabelWithScore('firmness', d.valIdx?.firmness, d.scores?.firmness),
+                        getSelectedCheckText('firmness', d.evaluation?.firmness),
+                        d.notes?.firmness || '',
+
+                        getOptionLabelWithScore('taste', d.valIdx?.taste, d.scores?.taste),
+                        getSelectedCheckText('taste', d.evaluation?.taste),
+                        d.notes?.taste || '',
+
+                        getOptionLabelWithScore('viscosity', d.valIdx?.viscosity, d.scores?.viscosity),
+                        getSelectedCheckText('viscosity', d.evaluation?.viscosity),
+                        d.notes?.viscosity || '',
+
+                        getOverallEvaluationLabel(d.overallEvaluation)
                     ]);
                 });
             });
 
             const BOM = "\uFEFF";
             const csvBody = [headers, ...rows]
-                .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
+                .map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))
                 .join('\n');
             const csvContent = BOM + csvBody;
 
-            const filename = `二期米成品測試盲測表單_${new Date().toISOString().slice(0,10)}.csv`;
+            const filename = `4_28炊飯向上盲測表單_${new Date().toISOString().slice(0,10)}.csv`;
             uploadCSVToDrive({ csvContent, filename, assessor });
         }
 
 
-        
         async function uploadCSVToDrive({ csvContent, filename, assessor }) {
             if (!DRIVE_WEBAPP_URL) {
                 alert('尚未設定 DRIVE_WEBAPP_URL，因此無法上傳到雲端硬碟。');
