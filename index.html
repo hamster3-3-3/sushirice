@@ -15,6 +15,9 @@
         .score-card:hover { transform: translateY(-1px); background-color: #ffffff; }
         .tab-btn { transition: all 0.3s; }
         .tab-btn.active { background-color: #1f2937; color: white; border-color: #1f2937; }
+        .tab-btn.special-tab { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .tab-btn.special-tab:hover { background-color: #fecaca; }
+        .tab-btn.special-tab.active { background-color: #dc2626; color: white; border-color: #dc2626; }
         select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 </head>
@@ -102,11 +105,14 @@
 
         const categories = [
             "鮪魚飯糰",
+            "雞肉飯糰",
+            "鮪魚 vs 雞肉",
             "肉鬆飯糰",
             "熟成紅鮭飯糰",
-            "雞肉飯糰",
             "低溫便當飯"
         ];
+
+        const specialComparisonCategory = "鮪魚 vs 雞肉";
 
         const categorySamples = {
             "低溫便當飯": ["A", "B", "C"]
@@ -290,6 +296,11 @@
         function initDataStore() {
             dataStore = {};
             categories.forEach(cat => {
+                if (cat === specialComparisonCategory) {
+                    dataStore[cat] = { comparisonChoice: '' };
+                    return;
+                }
+
                 const sampleCodes = getSampleCodes(cat);
                 dataStore[cat] = {
                     currentSelection: sampleCodes[0]
@@ -329,7 +340,7 @@
             container.innerHTML = categories.map((cat, idx) => `
                 <button
                     onclick="switchCategory(${idx})"
-                    class="tab-btn bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm md:text-base font-bold shadow-sm hover:bg-gray-50 ${idx === currentCategoryIdx ? 'active' : ''}">
+                    class="tab-btn ${cat === specialComparisonCategory ? 'special-tab' : 'bg-white hover:bg-gray-50'} border border-gray-200 rounded-2xl px-4 py-3 text-sm md:text-base font-bold shadow-sm ${idx === currentCategoryIdx ? 'active' : ''}">
                     ${cat}
                 </button>
             `).join('');
@@ -349,9 +360,30 @@
         
         function renderCurrentForm() {
             const catName = categories[currentCategoryIdx];
+            const container = document.getElementById('formContainer');
+
+            if (catName === specialComparisonCategory) {
+                const choice = dataStore[catName]?.comparisonChoice || '';
+                container.innerHTML = `
+                    <div class="sample-form space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <label class="text-xs font-bold text-gray-400 uppercase block mb-1">品項</label>
+                            <div class="text-2xl font-black text-gray-900 p-1">${catName}</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h2 class="text-lg font-bold text-gray-900 mb-4">本次試吃中，你認為哪款飯糰米飯整體表現較優</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${renderComparisonCard('鮪魚', choice === '鮪魚')}
+                                ${renderComparisonCard('雞肉', choice === '雞肉')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             const currentVersion = dataStore[catName].currentSelection;
             const currentData = dataStore[catName][currentVersion];
-            const container = document.getElementById('formContainer');
 
             const criteriaHtml = criteria.map((item, idx) => `
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -438,6 +470,17 @@
             `;
         }
 
+        function renderComparisonCard(value, isActive) {
+            const activeClass = isActive ? 'active' : '';
+            const fontClass = isActive ? 'font-bold text-gray-900' : 'text-gray-700 font-medium';
+            return `
+                <div onclick="updateComparisonChoice('${value}')"
+                     class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center ${activeClass}">
+                    <span class="${fontClass}">${value}</span>
+                </div>
+            `;
+        }
+
 function renderScoreCard(catName, category, val, score, text, isActive) {
             const activeClass = isActive ? 'active' : '';
             const fontClass = isActive ? 'font-bold text-gray-900' : 'text-gray-700 font-medium';
@@ -447,6 +490,11 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                     <span class="${fontClass}">${text}</span>
                 </div>
             `;
+        }
+
+        function updateComparisonChoice(value) {
+            dataStore[specialComparisonCategory].comparisonChoice = value;
+            renderCurrentForm();
         }
 
         function updateScore(catName, scoreCat, val, weightedScore) {
@@ -580,11 +628,13 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 '軟硬度得分', '軟硬度感受到項目', '軟硬度說明',
                 '味道得分', '味道感受到項目', '味道說明',
                 '黏度得分', '黏度感受到項目', '黏度說明',
-                '綜合評價'
+                '綜合評價',
+                '鮪魚 vs 雞肉'
             ];
 
             const rows = [];
             categories.forEach(cat => {
+                if (cat === specialComparisonCategory) return;
                 getSampleCodes(cat).forEach(ver => {
                     const d = dataStore[cat][ver] || {};
                     rows.push([
@@ -616,10 +666,25 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                         getSelectedCheckText('viscosity', d.evaluation?.viscosity),
                         d.notes?.viscosity || '',
 
-                        getOverallEvaluationLabel(d.overallEvaluation)
+                        getOverallEvaluationLabel(d.overallEvaluation),
+                        ''
                     ]);
                 });
             });
+
+            rows.push([
+                specialComparisonCategory,
+                assessor,
+                '',
+                '', '', '',
+                '', '', '',
+                '', '', '',
+                '', '', '',
+                '', '', '',
+                '', '', '',
+                '',
+                dataStore[specialComparisonCategory]?.comparisonChoice || ''
+            ]);
 
             const BOM = "\uFEFF";
             const csvBody = [headers, ...rows]
