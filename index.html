@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4/28炊飯向上盲測表單</title>
+    <title>5/19炊飯向上盲測表單</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -26,7 +26,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-800 pb-6">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">4/28炊飯向上盲測表單</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">5/19炊飯向上盲測表單</h1>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap justify-center gap-3">
                 <button onclick="exportCSV()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2">
@@ -54,7 +54,7 @@
                 >
                 <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">請先填寫評測者姓名（必填）。</p>
             </div>
-            <p class="text-gray-400 text-sm hidden md:block">切換 A/B 樣品時系統會自動保留您的評分與勾選項目。</p>
+            <p class="text-gray-400 text-sm hidden md:block">切換 A/B/C/D 樣品時系統會自動保留您的評分與勾選項目。</p>
         </div>
 
         <!-- 品項切換區 -->
@@ -75,6 +75,8 @@
                             <select class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-mono font-bold text-gray-900 outline-none cursor-pointer" disabled>
                                 <option selected>A</option>
                                 <option>B</option>
+                                <option>C</option>
+                                <option>D</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                         </div>
@@ -100,26 +102,19 @@
         const sampleOptions = {
             A: "A",
             B: "B",
-            C: "C"
+            C: "C",
+            D: "D"
         };
 
         const categories = [
             "鮪魚飯糰",
-            "雞肉飯糰",
-            "鮪魚 vs 雞肉",
-            "肉鬆飯糰",
-            "熟成紅鮭飯糰",
-            "低溫便當飯"
+            "熟成紅鮭飯糰"
         ];
 
-        const specialComparisonCategory = "鮪魚 vs 雞肉";
-
-        const categorySamples = {
-            "低溫便當飯": ["A", "B", "C"]
-        };
+        const categorySamples = {};
 
         function getSampleCodes(catName) {
-            return categorySamples[catName] || ["A", "B"];
+            return categorySamples[catName] || ["A", "B", "C", "D"];
         }
 
         const criteria = [
@@ -296,11 +291,6 @@
         function initDataStore() {
             dataStore = {};
             categories.forEach(cat => {
-                if (cat === specialComparisonCategory) {
-                    dataStore[cat] = { comparisonChoice: '' };
-                    return;
-                }
-
                 const sampleCodes = getSampleCodes(cat);
                 dataStore[cat] = {
                     currentSelection: sampleCodes[0]
@@ -340,7 +330,7 @@
             container.innerHTML = categories.map((cat, idx) => `
                 <button
                     onclick="switchCategory(${idx})"
-                    class="tab-btn ${cat === specialComparisonCategory ? 'special-tab' : 'bg-white hover:bg-gray-50'} border border-gray-200 rounded-2xl px-4 py-3 text-sm md:text-base font-bold shadow-sm ${idx === currentCategoryIdx ? 'active' : ''}">
+                    class="tab-btn bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm md:text-base font-bold shadow-sm ${idx === currentCategoryIdx ? 'active' : ''}">
                     ${cat}
                 </button>
             `).join('');
@@ -362,25 +352,6 @@
             const catName = categories[currentCategoryIdx];
             const container = document.getElementById('formContainer');
 
-            if (catName === specialComparisonCategory) {
-                const choice = dataStore[catName]?.comparisonChoice || '';
-                container.innerHTML = `
-                    <div class="sample-form space-y-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <label class="text-xs font-bold text-gray-400 uppercase block mb-1">品項</label>
-                            <div class="text-2xl font-black text-gray-900 p-1">${catName}</div>
-                        </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h2 class="text-lg font-bold text-gray-900 mb-4">本次試吃中，你認為哪款飯糰米飯整體表現較優</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                ${renderComparisonCard('鮪魚', choice === '鮪魚')}
-                                ${renderComparisonCard('雞肉', choice === '雞肉')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
 
             const currentVersion = dataStore[catName].currentSelection;
             const currentData = dataStore[catName][currentVersion];
@@ -470,16 +441,6 @@
             `;
         }
 
-        function renderComparisonCard(value, isActive) {
-            const activeClass = isActive ? 'active' : '';
-            const fontClass = isActive ? 'font-bold text-gray-900' : 'text-gray-700 font-medium';
-            return `
-                <div onclick="updateComparisonChoice('${value}')"
-                     class="score-card p-4 rounded-xl bg-gray-50 flex justify-between items-center ${activeClass}">
-                    <span class="${fontClass}">${value}</span>
-                </div>
-            `;
-        }
 
 function renderScoreCard(catName, category, val, score, text, isActive) {
             const activeClass = isActive ? 'active' : '';
@@ -492,10 +453,6 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
             `;
         }
 
-        function updateComparisonChoice(value) {
-            dataStore[specialComparisonCategory].comparisonChoice = value;
-            renderCurrentForm();
-        }
 
         function updateScore(catName, scoreCat, val, weightedScore) {
             const version = dataStore[catName].currentSelection;
@@ -628,13 +585,11 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 '軟硬度得分', '軟硬度感受到項目', '軟硬度說明',
                 '味道得分', '味道感受到項目', '味道說明',
                 '黏度得分', '黏度感受到項目', '黏度說明',
-                '綜合評價',
-                '鮪魚 vs 雞肉'
+                '綜合評價'
             ];
 
             const rows = [];
             categories.forEach(cat => {
-                if (cat === specialComparisonCategory) return;
                 getSampleCodes(cat).forEach(ver => {
                     const d = dataStore[cat][ver] || {};
                     rows.push([
@@ -666,25 +621,11 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                         getSelectedCheckText('viscosity', d.evaluation?.viscosity),
                         d.notes?.viscosity || '',
 
-                        getOverallEvaluationLabel(d.overallEvaluation),
-                        ''
+                        getOverallEvaluationLabel(d.overallEvaluation)
                     ]);
                 });
             });
 
-            rows.push([
-                specialComparisonCategory,
-                assessor,
-                '',
-                '', '', '',
-                '', '', '',
-                '', '', '',
-                '', '', '',
-                '', '', '',
-                '', '', '',
-                '',
-                dataStore[specialComparisonCategory]?.comparisonChoice || ''
-            ]);
 
             const BOM = "\uFEFF";
             const csvBody = [headers, ...rows]
@@ -692,7 +633,7 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 .join('\n');
             const csvContent = BOM + csvBody;
 
-            const filename = `4_28炊飯向上盲測表單_${new Date().toISOString().slice(0,10)}.csv`;
+            const filename = `5_19炊飯向上盲測表單_${new Date().toISOString().slice(0,10)}.csv`;
             uploadCSVToDrive({ csvContent, filename, assessor });
         }
 
