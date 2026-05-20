@@ -73,10 +73,8 @@
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品編號</label>
                         <div class="relative">
                             <select class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-mono font-bold text-gray-900 outline-none cursor-pointer" disabled>
-                                <option selected>A</option>
-                                <option>B</option>
-                                <option>C</option>
-                                <option>D</option>
+                                <option selected>加水量7400</option>
+                                <option>加水量7550</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                         </div>
@@ -100,10 +98,10 @@
         const UPLOAD_TOKEN = "rice_test_2025";
 
         const sampleOptions = {
-            A: "A",
-            B: "B",
-            C: "C",
-            D: "D"
+            "加水量7400": "加水量7400",
+            "加水量7550": "加水量7550",
+            "加水量7200": "加水量7200",
+            "加水量7350": "加水量7350"
         };
 
         const categories = [
@@ -111,7 +109,10 @@
             "熟成紅鮭飯糰"
         ];
 
-        const categorySamples = {};
+        const categorySamples = {
+            "鮪魚飯糰": ["加水量7400", "加水量7550"],
+            "熟成紅鮭飯糰": ["加水量7200", "加水量7350"]
+        };
 
         function getSampleCodes(catName) {
             return categorySamples[catName] || ["A", "B", "C", "D"];
