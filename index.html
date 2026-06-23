@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5/19炊飯向上盲測表單</title>
+    <title>6/23炊飯向上品評</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -26,7 +26,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-800 pb-6">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">5/19炊飯向上盲測表單</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">6/23炊飯向上品評</h1>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap justify-center gap-3">
                 <button onclick="exportCSV()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2">
@@ -54,7 +54,7 @@
                 >
                 <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">請先填寫評測者姓名（必填）。</p>
             </div>
-            <p class="text-gray-400 text-sm hidden md:block">切換 A/B/C/D 樣品時系統會自動保留您的評分與勾選項目。</p>
+            <p class="text-gray-400 text-sm hidden md:block">切換 A／B／C 時系統會自動保留您的評分與勾選項目。</p>
         </div>
 
         <!-- 品項切換區 -->
@@ -73,8 +73,8 @@
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品編號</label>
                         <div class="relative">
                             <select class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-mono font-bold text-gray-900 outline-none cursor-pointer" disabled>
-                                <option selected>加水量7400</option>
-                                <option>加水量7550</option>
+                                <option selected>晉欣</option>
+                                <option>大溪</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                         </div>
@@ -98,24 +98,24 @@
         const UPLOAD_TOKEN = "rice_test_2025";
 
         const sampleOptions = {
-            "加水量7400": "加水量7400",
-            "加水量7550": "加水量7550",
-            "加水量7200": "加水量7200",
-            "加水量7350": "加水量7350"
+            "晉欣": "晉欣",
+            "大溪": "大溪"
         };
 
         const categories = [
             "鮪魚飯糰",
-            "熟成紅鮭飯糰"
+            "熟成紅鮭飯糰",
+            "肉鬆飯糰"
         ];
 
         const categorySamples = {
-            "鮪魚飯糰": ["加水量7400", "加水量7550"],
-            "熟成紅鮭飯糰": ["加水量7200", "加水量7350"]
+            "鮪魚飯糰": ["晉欣", "大溪"],
+            "熟成紅鮭飯糰": ["晉欣", "大溪"],
+            "肉鬆飯糰": ["晉欣"]
         };
 
         function getSampleCodes(catName) {
-            return categorySamples[catName] || ["A", "B", "C", "D"];
+            return categorySamples[catName] || ["晉欣", "大溪"];
         }
 
         const criteria = [
@@ -133,7 +133,7 @@
                     "有光澤", "無光澤", "白色", "黃色",
                     "米粒輪廓清晰", "米粒表面凹凸不平，看起來模糊",
                     "胚芽明顯", "背線明顯", "碎米明顯",
-                    "米飯沒壓爛", "米粒大", "米粒小"
+                    "米飯被壓爛", "米粒大", "米粒小"
                 ]
             },
             {
@@ -634,7 +634,7 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 .join('\n');
             const csvContent = BOM + csvBody;
 
-            const filename = `5_19炊飯向上盲測表單_${new Date().toISOString().slice(0,10)}.csv`;
+            const filename = `6-23炊飯向上品評_${new Date().toISOString().slice(0,10)}.csv`;
             uploadCSVToDrive({ csvContent, filename, assessor });
         }
 
