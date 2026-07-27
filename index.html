@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6/23炊飯向上品評</title>
+    <title>7/28炊飯向上盲測</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -26,7 +26,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-800 pb-6">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">6/23炊飯向上品評</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">7/28炊飯向上盲測</h1>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap justify-center gap-3">
                 <button onclick="exportCSV()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2">
@@ -42,7 +42,7 @@
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row gap-4 items-center">
             <div class="w-full md:w-1/3">
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
-                    評測者 Assessor（必填）
+                    評測者 Assessor
                 </label>
                 <input
                     type="text"
@@ -52,9 +52,9 @@
                     placeholder="輸入評測人員姓名"
                     aria-required="true"
                 >
-                <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">請先填寫評測者姓名（必填）。</p>
+                <p id="assessorError" class="mt-2 text-xs text-red-500 hidden">尚未填寫評測者姓名。</p>
             </div>
-            <p class="text-gray-400 text-sm hidden md:block">切換 A／B／C 時系統會自動保留您的評分與勾選項目。</p>
+            <p class="text-gray-400 text-sm hidden md:block">切換樣品編號時系統會自動保留評分；未填項目會於提交時提醒，仍可選擇繼續提交。</p>
         </div>
 
         <!-- 品項切換區 -->
@@ -73,8 +73,8 @@
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品編號</label>
                         <div class="relative">
                             <select class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-mono font-bold text-gray-900 outline-none cursor-pointer" disabled>
-                                <option selected>晉欣</option>
-                                <option>大溪</option>
+                                <option selected>A</option>
+                                <option>B</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                         </div>
@@ -98,8 +98,8 @@
         const UPLOAD_TOKEN = "rice_test_2025";
 
         const sampleOptions = {
-            "晉欣": "晉欣",
-            "大溪": "大溪"
+            "A": "A",
+            "B": "B"
         };
 
         const categories = [
@@ -109,13 +109,13 @@
         ];
 
         const categorySamples = {
-            "鮪魚飯糰": ["晉欣", "大溪"],
-            "熟成紅鮭飯糰": ["晉欣", "大溪"],
-            "肉鬆飯糰": ["晉欣"]
+            "鮪魚飯糰": ["A", "B"],
+            "熟成紅鮭飯糰": ["A", "B"],
+            "肉鬆飯糰": ["A", "B"]
         };
 
         function getSampleCodes(catName) {
-            return categorySamples[catName] || ["晉欣", "大溪"];
+            return categorySamples[catName] || ["A", "B"];
         }
 
         const criteria = [
@@ -534,21 +534,60 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 .replace(/,/g, '，');
         }
 
-        function validateAssessorOrBlock() {
+        function collectMissingItems() {
+            const missingItems = [];
             const assessorEl = document.getElementById('globalAssessor');
-            const err = document.getElementById('assessorError');
-            const val = (assessorEl?.value || '').trim();
+            const assessor = (assessorEl?.value || '').trim();
 
-            if (!val) {
-                if (err) err.classList.remove('hidden');
-                assessorEl?.focus();
-                alert('請先填寫評測者姓名（必填）');
-                return null;
-            }
-            if (err) err.classList.add('hidden');
-            return val;
+            categories.forEach(cat => {
+                getSampleCodes(cat).forEach(ver => {
+                    const d = dataStore?.[cat]?.[ver] || {};
+
+                    criteria.forEach(item => {
+                        const value = d.valIdx?.[item.key];
+                        if (value === null || value === undefined || value === '') {
+                            missingItems.push(`${cat}／${ver}：${item.titleZh.replace(/^[一二三四五六七八九十]+、/, '')}`);
+                        }
+                    });
+
+                    if (!d.overallEvaluation) {
+                        missingItems.push(`${cat}／${ver}：綜合評價`);
+                    }
+                });
+            });
+
+            return { assessor, missingItems };
         }
 
+        function confirmSubmitWithMissingItems() {
+            const { assessor, missingItems } = collectMissingItems();
+            const assessorEl = document.getElementById('globalAssessor');
+            const err = document.getElementById('assessorError');
+
+            if (!assessor) {
+                if (err) err.classList.remove('hidden');
+                assessorEl?.focus();
+                alert('請先填寫評測者姓名，姓名未填寫時無法提交表單。');
+                return { confirmed: false, assessor: '' };
+            }
+
+            if (err) err.classList.add('hidden');
+
+            if (missingItems.length === 0) {
+                return { confirmed: true, assessor };
+            }
+
+            const preview = missingItems.slice(0, 20).map(item => `・${item}`).join('\n');
+            const moreText = missingItems.length > 20
+                ? `\n...另有 ${missingItems.length - 20} 個項目未填寫`
+                : '';
+
+            const confirmed = confirm(
+                `以下項目尚未填寫：\n\n${preview}${moreText}\n\n是否仍要提交表單？`
+            );
+
+            return { confirmed, assessor };
+        }
 
 
         function csvToBase64(str) {
@@ -575,8 +614,9 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
 
         
         function exportCSV() {
-            const assessor = validateAssessorOrBlock();
-            if (!assessor) return;
+            const submissionCheck = confirmSubmitWithMissingItems();
+            if (!submissionCheck.confirmed) return;
+            const assessor = submissionCheck.assessor;
 
             const headers = [
                 '品項', '評測者', '樣品代號',
@@ -634,7 +674,7 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 .join('\n');
             const csvContent = BOM + csvBody;
 
-            const filename = `6-23炊飯向上品評_${new Date().toISOString().slice(0,10)}.csv`;
+            const filename = `7-28炊飯向上盲測_${new Date().toISOString().slice(0,10)}.csv`;
             uploadCSVToDrive({ csvContent, filename, assessor });
         }
 
