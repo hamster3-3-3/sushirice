@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7/28炊飯向上盲測</title>
+    <title>115一期米品評確認</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -26,7 +26,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-800 pb-6">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">7/28炊飯向上盲測</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">115一期米品評確認</h1>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap justify-center gap-3">
                 <button onclick="exportCSV()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2">
@@ -67,14 +67,14 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品類別</label>
-                        <div class="text-2xl font-black text-gray-900 p-1">鮪魚飯糰</div>
+                        <div class="text-2xl font-black text-gray-900 p-1">11+16湖鹽飯</div>
                     </div>
                     <div class="w-full md:w-64">
                         <label class="text-xs font-bold text-gray-400 uppercase block mb-1">樣品編號</label>
                         <div class="relative">
                             <select class="w-full bg-gray-100 border-2 border-transparent focus:border-gray-900 rounded-xl p-3 font-mono font-bold text-gray-900 outline-none cursor-pointer" disabled>
-                                <option selected>A</option>
-                                <option>B</option>
+                                <option selected>大溪</option>
+                                <option>晉欣</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">▼</div>
                         </div>
@@ -98,24 +98,35 @@
         const UPLOAD_TOKEN = "rice_test_2025";
 
         const sampleOptions = {
-            "A": "A",
-            "B": "B"
+            "大溪": "大溪",
+            "晉欣": "晉欣",
+            "新豐": "新豐"
         };
 
         const categories = [
-            "鮪魚飯糰",
-            "熟成紅鮭飯糰",
-            "肉鬆飯糰"
+            "11+16湖鹽飯",
+            "11+16肉鬆湖鹽飯",
+            "一見鍾情",
+            "11號壽司飯(18℃)",
+            "11號壽司飯(4℃)",
+            "11號(一等)低溫冷藏飯",
+            "11號(特等)炒飯用飯",
+            "11號(一等)炒飯用飯"
         ];
 
         const categorySamples = {
-            "鮪魚飯糰": ["A", "B"],
-            "熟成紅鮭飯糰": ["A", "B"],
-            "肉鬆飯糰": ["A", "B"]
+            "11+16湖鹽飯": ["大溪", "晉欣"],
+            "11+16肉鬆湖鹽飯": ["大溪", "晉欣"],
+            "一見鍾情": ["大溪", "晉欣"],
+            "11號壽司飯(18℃)": ["大溪", "晉欣"],
+            "11號壽司飯(4℃)": ["大溪", "晉欣"],
+            "11號(一等)低溫冷藏飯": ["大溪", "晉欣", "新豐"],
+            "11號(特等)炒飯用飯": ["新豐", "晉欣"],
+            "11號(一等)炒飯用飯": ["新豐", "晉欣"]
         };
 
         function getSampleCodes(catName) {
-            return categorySamples[catName] || ["A", "B"];
+            return categorySamples[catName] || ["大溪", "晉欣"];
         }
 
         const criteria = [
@@ -327,7 +338,7 @@
             const container = document.getElementById('tabContainer');
             if (!container) return;
 
-            container.className = "grid grid-cols-2 md:grid-cols-3 gap-3 mb-6";
+            container.className = "grid grid-cols-2 md:grid-cols-4 gap-3 mb-6";
             container.innerHTML = categories.map((cat, idx) => `
                 <button
                     onclick="switchCategory(${idx})"
@@ -674,7 +685,7 @@ function renderScoreCard(catName, category, val, score, text, isActive) {
                 .join('\n');
             const csvContent = BOM + csvBody;
 
-            const filename = `7-28炊飯向上盲測_${new Date().toISOString().slice(0,10)}.csv`;
+            const filename = `115一期米品評確認_${new Date().toISOString().slice(0,10)}.csv`;
             uploadCSVToDrive({ csvContent, filename, assessor });
         }
 
